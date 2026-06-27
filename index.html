@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="Stock Web App – manage your home inventory offline, locally.">
+    <title>Stock App</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+<div class="app-container">
+
+    <!-- ═══ HEADER ═══ -->
+    <header class="app-header">
+        <!-- Home / Cari header -->
+        <div id="home-header-content">
+            <div class="header-title">
+                <div>
+                    <h1>Inventory</h1>
+                    <p>Manage your home stock</p>
+                </div>
+                <div class="sort-container">
+                    <select id="sortSelect" class="sort-select">
+                        <option value="category">By Category</option>
+                        <option value="name">By Name</option>
+                        <option value="stock">By Stok</option>
+                        <option value="opened">By Dibuka</option>
+                    </select>
+                    <button id="sortDirBtn" class="sort-dir-btn" aria-label="Toggle Sort Direction">
+                        <i class='bx bx-sort-up'></i>
+                    </button>
+                </div>
+            </div>
+            <div class="header-columns">
+                <div class="header-col">Nama</div>
+                <div class="header-col">Stok</div>
+                <div class="header-col">Dibuka</div>
+            </div>
+        </div>
+
+        <!-- Settings header -->
+        <div id="settings-header-content" style="display:none;">
+            <div class="header-title">
+                <h1>Pengaturan</h1>
+            </div>
+        </div>
+    </header>
+
+    <!-- ═══ SEARCH BAR ═══ -->
+    <div id="search-container" class="search-container" style="display:none;">
+        <div class="search-input-wrapper">
+            <i class='bx bx-search'></i>
+            <input type="text" id="searchInput" placeholder="Cari nama produk atau kategori...">
+            <button id="clearSearchBtn" class="clear-search-btn" style="display:none;">
+                <i class='bx bx-x-circle'></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- ═══ HOME VIEW ═══ -->
+    <main id="app-main" class="app-main"></main>
+
+    <!-- ═══ ADD PRODUCT VIEW ═══ -->
+    <main id="add-product-view" class="app-main" style="display:none;">
+        <div class="view-top-bar">
+            <button id="cancelAddBtn" class="back-btn"><i class='bx bx-arrow-back'></i></button>
+            <h2>Produk Baru</h2>
+            <div style="width:40px;"></div>
+        </div>
+        <div class="form-container">
+            <div class="form-group">
+                <label for="productName">Nama Produk</label>
+                <input type="text" id="productName" placeholder="e.g. Beras Putih">
+            </div>
+            <div class="form-group autocomplete-group">
+                <label for="productCategory">Kategori</label>
+                <input type="text" id="productCategory" placeholder="e.g. Bahan Pokok" autocomplete="off">
+                <div id="categorySuggestions" class="suggestions-box" style="display:none;"></div>
+            </div>
+            <div class="form-group-row">
+                <div class="form-group">
+                    <label for="productStock">Stok</label>
+                    <input type="number" id="productStock" placeholder="0" min="0" step="any">
+                </div>
+                <div class="form-group">
+                    <label for="productOpened">Dibuka</label>
+                    <input type="number" id="productOpened" placeholder="0" min="0" step="any">
+                </div>
+            </div>
+            <button id="confirmAddBtn" class="primary-btn">
+                <i class='bx bx-check'></i> Simpan Produk
+            </button>
+        </div>
+    </main>
+
+    <!-- ═══ SETTINGS VIEW ═══ -->
+    <main id="settings-view" class="app-main" style="display:none;">
+        <div class="settings-container">
+            <div class="settings-list">
+                <button class="settings-item" id="exportBtn">
+                    <div class="settings-item-left">
+                        <div class="settings-icon-wrap green">
+                            <i class='bx bx-export'></i>
+                        </div>
+                        <div>
+                            <span class="settings-item-title">Export Data</span>
+                            <span class="settings-item-sub">Unduh inventori sebagai CSV</span>
+                        </div>
+                    </div>
+                    <i class='bx bx-chevron-right settings-chevron'></i>
+                </button>
+
+                <button class="settings-item" id="importBtn">
+                    <div class="settings-item-left">
+                        <div class="settings-icon-wrap blue">
+                            <i class='bx bx-import'></i>
+                        </div>
+                        <div>
+                            <span class="settings-item-title">Import Data</span>
+                            <span class="settings-item-sub">Muat dari file CSV</span>
+                        </div>
+                    </div>
+                    <i class='bx bx-chevron-right settings-chevron'></i>
+                </button>
+                <!-- Hidden file input for import -->
+                <input type="file" id="importFileInput" accept=".csv" style="display:none;">
+
+                <button class="settings-item" id="manageCategoryBtn">
+                    <div class="settings-item-left">
+                        <div class="settings-icon-wrap orange">
+                            <i class='bx bx-category'></i>
+                        </div>
+                        <div>
+                            <span class="settings-item-title">Kelola Kategori</span>
+                            <span class="settings-item-sub">Lihat dan hapus kategori</span>
+                        </div>
+                    </div>
+                    <i class='bx bx-chevron-right settings-chevron'></i>
+                </button>
+            </div>
+
+            <p class="settings-footer">Data disimpan secara lokal di browser Anda.<br>Tidak memerlukan koneksi internet.</p>
+        </div>
+    </main>
+
+    <!-- ═══ FAB ═══ -->
+    <button class="fab-button" aria-label="Tambah Produk">
+        <i class='bx bx-plus'></i>
+    </button>
+
+    <!-- ═══ BOTTOM NAV ═══ -->
+    <nav class="bottom-nav">
+        <button class="nav-item active" id="nav-beranda">
+            <i class='bx bxs-home'></i>
+            <span>Beranda</span>
+        </button>
+        <button class="nav-item" id="nav-cari">
+            <i class='bx bx-search'></i>
+            <span>Cari</span>
+        </button>
+        <button class="nav-item" id="nav-pengaturan">
+            <i class='bx bx-cog'></i>
+            <span>Pengaturan</span>
+        </button>
+    </nav>
+
+</div>
+
+<!-- ═══ CATEGORY MANAGER MODAL ═══ -->
+<div id="category-modal" class="modal-overlay">
+    <div class="modal-sheet">
+        <div class="modal-handle"></div>
+        <div class="modal-header">
+            <h3>Kelola Kategori</h3>
+            <button id="category-modal-close" class="modal-close-btn">
+                <i class='bx bx-x'></i>
+            </button>
+        </div>
+        <div id="category-modal-list" class="category-modal-list"></div>
+    </div>
+</div>
+
+<!-- ═══ TOAST ═══ -->
+<div id="toast" class="toast"></div>
+
+<script src="main.js"></script>
+</body>
+</html>
