@@ -39,6 +39,7 @@
                 <div class="header-col">Nama</div>
                 <div class="header-col">Stok</div>
                 <div class="header-col">Dibuka</div>
+                <div class="header-col"></div>
             </div>
         </div>
 
@@ -184,7 +185,37 @@
     </div>
 </div>
 
-<!-- ═══ TOAST ═══ -->
+<!-- ═══ EDIT PRODUCT MODAL ═══ -->
+<div id="edit-product-modal" class="modal-overlay">
+    <div class="modal-sheet">
+        <div class="modal-handle"></div>
+        <div class="modal-header">
+            <h3>Edit Produk</h3>
+            <button id="edit-product-modal-close" class="modal-close-btn">
+                <i class='bx bx-x'></i>
+            </button>
+        </div>
+        <div class="form-container" style="border: none; padding-top: 16px; background: transparent;">
+            <div class="form-group">
+                <label for="editProductName">Nama Produk</label>
+                <input type="text" id="editProductName">
+            </div>
+            <div class="form-group-row">
+                <div class="form-group">
+                    <label for="editProductStock">Stok</label>
+                    <input type="number" id="editProductStock" min="0" step="any">
+                </div>
+                <div class="form-group">
+                    <label for="editProductOpened">Dibuka</label>
+                    <input type="number" id="editProductOpened" min="0" step="any">
+                </div>
+            </div>
+            <button id="confirmEditBtn" class="primary-btn">
+                <i class='bx bx-check'></i> Simpan Perubahan
+            </button>
+        </div>
+    </div>
+</div>
 <div id="toast" class="toast"></div>
 
 <script src="main.js"></script>

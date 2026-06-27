@@ -77,6 +77,15 @@
     const productUnitInput    = document.getElementById('productUnit');
     const categorySuggestions = document.getElementById('categorySuggestions');
 
+    // Edit Modal
+    const editProductModal    = document.getElementById('edit-product-modal');
+    const editModalCloseBtn   = document.getElementById('edit-product-modal-close');
+    const editProductName     = document.getElementById('editProductName');
+    const editProductStock    = document.getElementById('editProductStock');
+    const editProductOpened   = document.getElementById('editProductOpened');
+    const confirmEditBtn      = document.getElementById('confirmEditBtn');
+    let editState = { category: '', originalName: '' };
+
     // Sort
     const sortSelect          = document.getElementById('sortSelect');
     const sortDirBtn          = document.getElementById('sortDirBtn');
@@ -119,7 +128,36 @@
             </div>
             <div class="product-qty">${item.stock}</div>
             <div class="product-qty">${item.opened}</div>
+            <button class="product-delete-btn" aria-label="Delete product">
+                <i class='bx bx-trash'></i>
+            </button>
         `;
+        
+        card.addEventListener('click', () => {
+            showEditModal(categoryName, item.name);
+        });
+        
+        const deleteBtn = card.querySelector('.product-delete-btn');
+        deleteBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (confirm(`Hapus produk "${item.name}"?`)) {
+                const group = inventoryData.find(g => g.category.toLowerCase() === categoryName.toLowerCase());
+                if (group) {
+                    const index = group.items.findIndex(i => i.name === item.name);
+                    if (index > -1) {
+                        group.items.splice(index, 1);
+                        if (group.items.length === 0) {
+                            const gIndex = inventoryData.indexOf(group);
+                            inventoryData.splice(gIndex, 1);
+                        }
+                        saveData();
+                        renderInventory();
+                        showToast(`Produk "${item.name}" dihapus.`);
+                    }
+                }
+            }
+        });
+
         return card;
     }
 
@@ -363,6 +401,65 @@
         renderInventory();
         hideAddView();
         showToast(`"${name}" added!`);
+    });
+
+    // ─── EDIT PRODUCT ─────────────────────────────────────────────────────────
+    function showEditModal(category, name) {
+        const group = inventoryData.find(g => g.category.toLowerCase() === category.toLowerCase());
+        if (!group) return;
+        const item = group.items.find(i => i.name === name);
+        if (!item) return;
+
+        editState.category = group.category;
+        editState.originalName = name;
+
+        editProductName.value = item.name;
+        editProductStock.value = item.stock;
+        editProductOpened.value = item.opened;
+
+        editProductModal.classList.add('open');
+    }
+
+    function hideEditModal() {
+        editProductModal.classList.remove('open');
+    }
+
+    editModalCloseBtn.addEventListener('click', hideEditModal);
+    editProductModal.addEventListener('click', e => {
+        if (e.target === editProductModal) hideEditModal();
+    });
+
+    confirmEditBtn.addEventListener('click', () => {
+        const newName = editProductName.value.trim();
+        const newStock = parseFloat(editProductStock.value) || 0;
+        const newOpened = parseFloat(editProductOpened.value) || 0;
+
+        if (!newName) {
+            showToast('Nama produk tidak boleh kosong!', 'error');
+            return;
+        }
+
+        const group = inventoryData.find(g => g.category === editState.category);
+        if (!group) return;
+        const item = group.items.find(i => i.name === editState.originalName);
+        if (!item) return;
+
+        if (newName.toLowerCase() !== editState.originalName.toLowerCase()) {
+            const duplicate = group.items.find(i => i.name.toLowerCase() === newName.toLowerCase());
+            if (duplicate) {
+                showToast(`Produk "${newName}" sudah ada!`, 'error');
+                return;
+            }
+        }
+
+        item.name = newName;
+        item.stock = newStock;
+        item.opened = newOpened;
+
+        saveData();
+        renderInventory();
+        hideEditModal();
+        showToast(`"${newName}" berhasil diupdate!`);
     });
 
     // ─── EXPORT CSV ───────────────────────────────────────────────────────────
